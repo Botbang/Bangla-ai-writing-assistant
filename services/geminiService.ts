@@ -1,21 +1,13 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 // FIX: Add imports for new types and constants.
 import type { Correction, FileInfo, ChatMessage } from '../types';
 // FIX: Add RE_SYSTEM_INSTRUCTION to imports.
 import { GEMINI_MODEL, SYSTEM_INSTRUCTION, RE_SYSTEM_INSTRUCTION } from '../constants';
 
-let ai: GoogleGenAI | null = null;
-
-/**
- * Initializes the GoogleGenAI client with a user-provided API key.
- * @param apiKey The user's Gemini API key.
- */
-export const initializeGeminiClient = (apiKey: string): void => {
-  if (!apiKey) {
-    throw new Error("API key is missing.");
-  }
-  ai = new GoogleGenAI({ apiKey });
-};
+// FIX: Initialize the GoogleGenAI client directly using the environment variable as per guidelines.
+// This removes the need for UI-based API key management and the initializeGeminiClient function.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 
 const responseSchema = {
@@ -46,9 +38,7 @@ const responseSchema = {
  * @returns A promise that resolves to an array of Correction objects.
  */
 export const checkBengaliText = async (text: string): Promise<Correction[]> => {
-  if (!ai) {
-    throw new Error("Gemini client is not initialized. Please provide a valid API key.");
-  }
+  // FIX: Removed check for AI client initialization as it's now handled at the module level.
   if (!text.trim()) {
     return [];
   }
@@ -94,9 +84,7 @@ export const checkBengaliText = async (text: string): Promise<Correction[]> => {
  * @returns A promise that resolves to the assistant's response.
  */
 export const getGuidance = async (fileInfo: FileInfo, history: ChatMessage[], question: string): Promise<string> => {
-    if (!ai) {
-        throw new Error("Gemini client is not initialized. Please provide a valid API key.");
-    }
+    // FIX: Removed check for AI client initialization as it's now handled at the module level.
 
     const fileDataContext = `
 Context for my questions: I am analyzing an executable file with the following properties:

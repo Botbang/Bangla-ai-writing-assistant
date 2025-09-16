@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useMemo } from 'react';
 import type { Correction } from '../types';
 
@@ -65,7 +66,9 @@ export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, d
   const [activeCorrection, setActiveCorrection] = useState<{ correction: Correction; index: number } | null>(null);
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
   const displayRef = useRef<HTMLDivElement>(null);
-  const hidePopoverTimeout = useRef<NodeJS.Timeout | null>(null);
+  // FIX: Use ReturnType<typeof setTimeout> for an environment-agnostic timer ID type.
+  // NodeJS.Timeout is specific to Node.js and causes errors in browser environments.
+  const hidePopoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const handleCorrectionApply = (correctionToApply: Correction) => {
       onTextChange(text.replace(correctionToApply.incorrect, correctionToApply.correct));
