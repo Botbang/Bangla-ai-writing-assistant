@@ -4,25 +4,64 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gemini Bangla Assistant</title>
+    <title>Bangla AI Writing Assistant</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Elevate your Bengali writing with our intelligent assistant. Get real-time grammar corrections, spelling suggestions, and stylistic improvements powered by Google Gemini to make your text clear, accurate, and professional." />
+    <meta name="keywords" content="Bengali writing assistant, Bangla grammar checker, Bengali spell checker, AI writing tool, Gemini API, বাংলা লেখা, বাংলা বানান, বাংলা ব্যাকরণ" />
+    <meta name="author" content="Google Gemini" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Bangla AI Writing Assistant" />
+    <meta property="og:description" content="Elevate your Bengali writing with our intelligent assistant. Get real-time grammar corrections, spelling suggestions, and stylistic improvements powered by Google Gemini to make your text clear, accurate, and professional." />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Bangla AI Writing Assistant" />
+    <meta property="twitter:description" content="Elevate your Bengali writing with our intelligent assistant. Get real-time grammar corrections, spelling suggestions, and stylistic improvements powered by Google Gemini to make your text clear, accurate, and professional." />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <script>
+      // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
     <style>
       body {
         font-family: 'Noto Sans Bengali', sans-serif;
       }
-      /* Custom scrollbar */
+       /* Custom scrollbar for dark mode */
+      .dark ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .dark ::-webkit-scrollbar-track {
+        background: #1e293b; /* slate-800 */
+      }
+      .dark ::-webkit-scrollbar-thumb {
+        background: #475569; /* slate-600 */
+        border-radius: 4px;
+      }
+      .dark ::-webkit-scrollbar-thumb:hover {
+        background: #64748b; /* slate-500 */
+      }
+      /* Custom scrollbar for light mode */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #1e293b; /* slate-800 */
+        background: #f1f5f9; /* slate-100 */
       }
       ::-webkit-scrollbar-thumb {
-        background: #475569; /* slate-600 */
+        background: #94a3b8; /* slate-400 */
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
@@ -42,7 +81,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-900 text-slate-200">
+  <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

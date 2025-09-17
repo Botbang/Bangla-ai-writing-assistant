@@ -1,13 +1,37 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-// FIX: Add imports for new types and constants.
 import type { Correction, FileInfo, ChatMessage } from '../types';
-// FIX: Add RE_SYSTEM_INSTRUCTION to imports.
 import { GEMINI_MODEL, SYSTEM_INSTRUCTION, RE_SYSTEM_INSTRUCTION } from '../constants';
 
-// FIX: Initialize the GoogleGenAI client directly using the environment variable as per guidelines.
-// This removes the need for UI-based API key management and the initializeGeminiClient function.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+let ai: GoogleGenAI | null = null;
+
+/**
+ * Initializes the Gemini AI client with the provided API key.
+ * @param apiKey The user's Google Gemini API key.
+ * @returns true if the client was set, false otherwise.
+ */
+export const initializeGeminiClient = (apiKey: string): boolean => {
+  if (!apiKey) {
+    ai = null;
+    return false;
+  }
+  try {
+    ai = new GoogleGenAI({ apiKey });
+    return true;
+  } catch (error) {
+    console.error("Failed to initialize Gemini client:", error);
+    ai = null;
+    return false;
+  }
+};
+
+/**
+ * Checks if the Gemini client is ready to make API calls.
+ * @returns boolean
+ */
+export const isGeminiClientInitialized = (): boolean => {
+  return ai !== null;
+};
 
 
 const responseSchema = {
@@ -38,7 +62,10 @@ const responseSchema = {
  * @returns A promise that resolves to an array of Correction objects.
  */
 export const checkBengaliText = async (text: string): Promise<Correction[]> => {
-  // FIX: Removed check for AI client initialization as it's now handled at the module level.
+  if (!ai) {
+    throw new Error("Gemini AI client is not initialized.");
+  }
+
   if (!text.trim()) {
     return [];
   }
@@ -75,7 +102,6 @@ export const checkBengaliText = async (text: string): Promise<Correction[]> => {
   return [];
 };
 
-// FIX: Add missing getGuidance function for the file analyzer chat feature.
 /**
  * Gets guidance from Gemini for reverse engineering a file.
  * @param fileInfo The basic info of the file being analyzed.
@@ -84,7 +110,9 @@ export const checkBengaliText = async (text: string): Promise<Correction[]> => {
  * @returns A promise that resolves to the assistant's response.
  */
 export const getGuidance = async (fileInfo: FileInfo, history: ChatMessage[], question: string): Promise<string> => {
-    // FIX: Removed check for AI client initialization as it's now handled at the module level.
+    if (!ai) {
+        throw new Error("Gemini AI client is not initialized.");
+    }
 
     const fileDataContext = `
 Context for my questions: I am analyzing an executable file with the following properties:
@@ -123,6 +151,6 @@ ${fileInfo.extractedStrings.length > 50 ? '\n... (and more strings were found)' 
         return response.text;
     } catch (e) {
         console.error("Failed to get guidance from Gemini:", e);
-        return "Sorry, I encountered an error while trying to get a response. Please check the console for details.";
+        return "Sorry, I encountered an error while trying to get a response. Please check your API Key and network connection.";
     }
 };

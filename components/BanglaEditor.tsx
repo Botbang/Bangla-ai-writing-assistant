@@ -24,26 +24,26 @@ const SuggestionPopover: React.FC<SuggestionPopoverProps> = ({
       style={{ top: position.top, left: position.left, maxWidth: '20rem' }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute z-20 bg-slate-800 border border-slate-600 rounded-lg shadow-2xl p-3 text-sm flex flex-col space-y-2"
+      className="absolute z-20 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg shadow-2xl p-3 text-sm flex flex-col space-y-2"
     >
-      <p className="font-semibold text-slate-300">সংশোধন:</p>
+      <p className="font-semibold text-slate-700 dark:text-slate-300">সংশোধন:</p>
       <button
         onClick={() => onApply(correction)}
-        className="w-full text-left px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-500/30 text-emerald-300 rounded-md transition-colors"
+        className="w-full text-left px-3 py-1.5 bg-emerald-100/50 dark:bg-emerald-600/20 hover:bg-emerald-100 dark:hover:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 rounded-md transition-colors"
       >
         {correction.correct}
       </button>
-      <p className="text-xs text-slate-400 italic border-t border-slate-700 pt-2">{correction.explanation}</p>
-      <div className="flex items-center space-x-2 pt-2 border-t border-slate-700">
+      <p className="text-xs text-slate-500 dark:text-slate-400 italic border-t border-slate-200 dark:border-slate-700 pt-2">{correction.explanation}</p>
+      <div className="flex items-center space-x-2 pt-2 border-t border-slate-200 dark:border-slate-700">
         <button
           onClick={onIgnore}
-          className="flex-1 text-center px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs rounded-md transition-colors"
+          className="flex-1 text-center px-2 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 text-xs rounded-md transition-colors"
         >
          উপেক্ষা করুন
         </button>
          <button
           onClick={() => onAddToDictionary(correction.incorrect)}
-          className="flex-1 text-center px-2 py-1 bg-sky-700 hover:bg-sky-600 text-sky-200 text-xs rounded-md transition-colors"
+          className="flex-1 text-center px-2 py-1 bg-sky-600 hover:bg-sky-700 text-sky-100 dark:bg-sky-700 dark:hover:bg-sky-600 dark:text-sky-200 text-xs rounded-md transition-colors"
         >
           ডিকশনারিতে যোগ করুন
         </button>
@@ -60,14 +60,13 @@ interface BanglaEditorProps {
   onTextChange: (newText: string) => void;
   onAddToDictionary: (word: string) => void;
   isLoading: boolean;
+  isDisabled?: boolean;
 }
 
-export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, dictionary, onTextChange, onAddToDictionary, isLoading }) => {
+export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, dictionary, onTextChange, onAddToDictionary, isLoading, isDisabled = false }) => {
   const [activeCorrection, setActiveCorrection] = useState<{ correction: Correction; index: number } | null>(null);
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
   const displayRef = useRef<HTMLDivElement>(null);
-  // FIX: Use ReturnType<typeof setTimeout> for an environment-agnostic timer ID type.
-  // NodeJS.Timeout is specific to Node.js and causes errors in browser environments.
   const hidePopoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const handleCorrectionApply = (correctionToApply: Correction) => {
@@ -120,7 +119,7 @@ export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, d
   };
 
   const renderedText = useMemo(() => {
-    if (!filteredCorrections.length) {
+    if (isDisabled || !filteredCorrections.length) {
       return text;
     }
     
@@ -139,7 +138,7 @@ export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, d
         return (
           <span
             key={`${i}-${currentIndex}`}
-            className="bg-red-500/30 hover:bg-red-500/40 cursor-pointer rounded px-1 py-0.5 transition-colors"
+            className="bg-red-500/20 dark:bg-red-500/30 hover:bg-red-500/30 dark:hover:bg-red-500/40 cursor-pointer rounded px-1 py-0.5 transition-colors"
             onMouseEnter={(e) => handleHighlightMouseEnter(correction, currentIndex, e)}
             onMouseLeave={handleMouseLeaveWithDelay}
           >
@@ -149,20 +148,21 @@ export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, d
       }
       return part;
     });
-  }, [text, filteredCorrections]);
+  }, [text, filteredCorrections, isDisabled]);
 
 
   return (
-    <div className="relative bg-slate-800/50 border border-slate-700 rounded-xl shadow-lg">
-        <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-             <h2 className="text-lg font-bold text-emerald-400">
+    <div className="relative bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg">
+        <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+             <h2 className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                 বাংলা এডিটর
              </h2>
              <div className="flex items-center space-x-4">
-                {filteredCorrections.length > 0 && !isLoading && (
+                {filteredCorrections.length > 0 && !isLoading && !isDisabled && (
                     <button 
                         onClick={handleFixAll}
-                        className="flex items-center space-x-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg shadow-md transition-all duration-200 disabled:opacity-50"
+                        disabled={isLoading || isDisabled}
+                        className="flex items-center space-x-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -171,26 +171,27 @@ export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, d
                     </button>
                 )}
                  {isLoading && (
-                    <div className="flex items-center space-x-2 text-sm text-slate-400">
-                        <div className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
+                        <div className="w-4 h-4 border-2 border-slate-400 dark:border-slate-500 border-t-transparent rounded-full animate-spin"></div>
                         <span>পরীক্ষা চলছে...</span>
                     </div>
                  )}
              </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-700">
-            <div className="p-4 bg-slate-800 md:rounded-bl-xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-200 dark:bg-slate-700">
+            <div className="p-4 bg-white dark:bg-slate-800 md:rounded-bl-xl">
                  <textarea
                     value={text}
                     onChange={(e) => onTextChange(e.target.value)}
-                    placeholder="এখানে লিখুন..."
-                    className="w-full h-64 md:h-96 p-2 bg-slate-900/50 border border-slate-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base leading-relaxed"
+                    placeholder={isDisabled ? "অনুগ্রহ করে কাজ শুরু করার জন্য সেটিংসে আপনার API কী যোগ করুন।" : "এখানে লিখুন..."}
+                    disabled={isDisabled}
+                    className="w-full h-64 md:h-96 p-2 bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base leading-relaxed disabled:opacity-70 disabled:cursor-not-allowed"
                  />
             </div>
             
-            <div ref={displayRef} className="relative p-4 bg-slate-800 md:rounded-br-xl">
-                <div className="w-full h-64 md:h-96 p-2 bg-slate-900/50 border border-transparent rounded-md text-base leading-relaxed whitespace-pre-wrap">
+            <div ref={displayRef} className="relative p-4 bg-white dark:bg-slate-800 md:rounded-br-xl">
+                <div className="w-full h-64 md:h-96 p-2 bg-slate-50 dark:bg-slate-900/50 border border-transparent rounded-md text-base leading-relaxed whitespace-pre-wrap">
                     {renderedText}
                 </div>
                  {activeCorrection && (
@@ -212,7 +213,7 @@ export const BanglaEditor: React.FC<BanglaEditorProps> = ({ text, corrections, d
                 )}
             </div>
         </div>
-        <div className="p-2 border-t border-slate-700 text-center text-xs text-slate-500">
+        <div className="p-2 border-t border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500">
             <p><strong>বাম:</strong> আপনার লেখা | <strong>ডান:</strong> AI বিশ্লেষণ ও পরামর্শ (ভুলের উপর হোভার করুন)</p>
         </div>
     </div>
